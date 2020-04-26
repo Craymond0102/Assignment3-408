@@ -97,7 +97,6 @@ def boundry_check3(df, cutoff):
 
 class bloomberg_clean():
     def __init__(self, ticker_list):
-#        print(ticker_list)
         self.ticker_list = ticker_list
         self.crud = CRUD()
         self.start_cleaning()
@@ -115,7 +114,8 @@ class bloomberg_clean():
                     continue
 
                 full_df = self.resampleANDmerge(price,ask,bid)
-                #self.crud.insertDf(full_df, "market_tick")
+                #self.crud.insertDf(full_df, "market_tick") --> You'll want to connect your own db
+                                                            #   and then uncomment this to work
 
                 ohlc_df = self.OHLC(full_df)
                 #self.crud.insertDf(ohlc_df, "ohlc")
