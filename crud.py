@@ -10,7 +10,7 @@ import sqlalchemy
 from sqlalchemy import exc
 import pandas as pd
 
-
+### example (Does not work need to put own credentials)
 host = "172.23.0.2"
 port = "3306"
 user = "myuser"
