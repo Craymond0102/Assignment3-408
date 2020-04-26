@@ -12,8 +12,16 @@ DELIVERABLES -
   dataGenerator.py
   crud.py
   data/
-    2020-04-13.csv - 2020-04-17.csv
+    AAPL/
+      2020-04-13.csv - 2020-04-17.csv
   sql/
+    Algorithm.sql
+    Portfolio.sql
+    Traders.sql
+    Trades.sql
+    tickers.sql
+    market_tick.sql
+    tick_data.sql
     
 Instructions on how to run -
 
