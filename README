@@ -1,15 +1,28 @@
 Charlie Raymond, 2306164, raymond@chapman.edu
 Assignment 3
 
-deliverables - 
+The assignment called for the data generator and the data exporter to work together.
+However, I had a far larger need for my project, so I decided to make them seperate.
+dataGenerator.py will generate Orders to fill my Order table. bloomberg.py will clean
+tick data that I have collected and put it into our market_tick & ohlc tables in the 
+database 
 
-
+DELIVERABLES - 
+  bloomberg.py
+  dataGenerator.py
+  crud.py
+  data/
+    2020-04-13.csv - 2020-04-17.csv
+  sql/
+    
 Instructions on how to run -
 
 dataGenerator:
+  python3 dataGenerator <file output> <number to be generated>
+  example - python3 dataGenerator output.csv 1000
 
-dataCleaner:
-
+bloomberg:
+  python3 bloombery.py
 
 
 
