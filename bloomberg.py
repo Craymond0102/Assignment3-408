@@ -23,7 +23,7 @@ from multiprocessing import Process
 
 worker_number = 1
 
-unproc_path = "/hdd/data/unprocessed/"
+unproc_path = "data/"
 proc_path = "/hdd/data/processed/"
 
 ticker_list = os.listdir(unproc_path)
@@ -44,9 +44,7 @@ def up_row(df, count):
     Upsamples df time values
 '''
 def up_sample(df):
-    #compare_time = datetime.strptime(str(df.index.min().date())+ " 09:30:00", "%Y-%m-%d %H:%M:%S")
     compare_time = datetime.strptime(str(df.index[0].date())+ " 09:30:00", "%Y-%m-%d %H:%M:%S")
-    #dif = df.index[0] - compare_time
     dif = df.index.min() - compare_time
     seconds = int(dif.total_seconds()/10)
     if seconds != 0:
@@ -59,7 +57,6 @@ def up_sample(df):
 def down_row(df, count):
     for x in range(count):
        new_row = pd.DataFrame({"ticker":df.iloc[0]['ticker'],'price':np.NaN,'volume':np.NaN},index=[df.index[len(df)-1]+timedelta(seconds=10)])
-       #new_row = pd.DataFrame({"ticker":df.iloc[0]['ticker'],'price':np.NaN,'volume':np.NaN},index=[df.index.max()]+timedelta(seconds=10)])
        df = pd.concat([df, new_row], sort=True)
 
     df.index.name = 'timestamp'
@@ -71,7 +68,6 @@ def down_row(df, count):
 '''
 def down_sample(df):
    compare_time = datetime.strptime(str(df.index[0].date())+ " 16:00:00", "%Y-%m-%d %H:%M:%S")
-    #compare_time = datetime.strptime(str(df.index.max().date())+ " 16:00:00", "%Y-%m-%d %H:%M:%S")
  
    dif = compare_time - df.index.max()
    seconds = int(dif.total_seconds()/10)
@@ -111,35 +107,22 @@ class bloomberg_clean():
             file_list = os.listdir(unproc_path+ticker)
             for file_ in file_list:
                 df = self.getDay(ticker, file_)
-
-                #print(df)
-                #exit(0)
     
                 price, ask, bid = self.seperateType(df)
 
                 if price.empty:
                     print("EMPTY CSV, " + ticker + ", " + file_)
                     continue
-                #print(price) 
-                #print(ask) 
-                #print(bid) 
 
                 full_df = self.resampleANDmerge(price,ask,bid)
-                #print(full_df)
-                self.crud.insertDf(full_df, "market_tick")
+                #self.crud.insertDf(full_df, "market_tick")
 
                 ohlc_df = self.OHLC(full_df)
-                #print(ohlc_df)
-                self.crud.insertDf(ohlc_df, "ohlc")
+                #self.crud.insertDf(ohlc_df, "ohlc")
 
-                #exit(0)
-#            exit(0)
 
-    ### ADD MORE CLEANING HERE! --> timeStamp???
     def getDay(self, ticker, file_):
         df = pd.read_csv(unproc_path+ticker+"/"+file_, index_col='times').drop(['Unnamed: 0'], axis=1).drop(['condcode'],axis=1)
-        #if df.empty:
-            #print("DAY " + file_[-4:]+"was empty")
 
         df = df.rename({'value':'price'}, axis=1)
         df['ticker'] = ticker
@@ -148,9 +131,7 @@ class bloomberg_clean():
         df['type'] = df['type'].replace({'BID':'bid'})
 
 
-        ### RIGHT HERE ADD TIME CHECK. IF TIME IS lESS THEN 9:30, ADD ONE HOUR
         df.index = pd.to_datetime(df.index)
-    
 
         if df.empty:
             print("DAY " + file_[-4:]+"was empty")
@@ -199,7 +180,6 @@ class bloomberg_clean():
         price_last = up_sample(price_last)
         price_last = down_sample(price_last)
 
-        #print(price_last)
         ask_last = ask_df.resample('10s', label='right', closed='right').last().fillna(method='ffill')
         bid_last = bid_df.resample('10s', label='right', closed='right').last().fillna(method='ffill')
 
@@ -208,7 +188,6 @@ class bloomberg_clean():
         full_df['date']=[d.date().strftime('%Y-%m-%d') for d in full_df.index]
         full_df['time']=[d.time() for d in full_df.index]
 
-        #print(full_df)
         return full_df
 
     def OHLC(self, full_df):
@@ -217,11 +196,9 @@ class bloomberg_clean():
         one_min_ohlc.index = pd.to_datetime(one_min_ohlc.index)
         one_min_ohlc.index.name = 'timestamp'
 
-        #one_min_ohlc['date']=[d.date() for d in one_min_ohlc.index]
         one_min_ohlc['date']=[d.date().strftime('%Y-%m-%d') for d in one_min_ohlc.index]
         one_min_ohlc['time']=[d.time() for d in one_min_ohlc.index]
 
-        #print(one_min_ohlc)
         return one_min_ohlc 
 
     def removeFile(self, ticker, file_):
@@ -243,5 +220,3 @@ if __name__ == "__main__":
     for i in range(worker_number):
         workers[i].join()
 
-
-    #print("HI")
